@@ -1,0 +1,11 @@
+[
+  {
+    "text": "SERVICES AGREEMENT effective 2026-01-01 between Acme Ltd (Client) and Zenith LLC (Vendor).\n3.1 Client shall pay each invoice within 30 days of receipt.\n4.2 Vendor shall deliver the Phase 1 report by 2026-03-15.\n8.1 Either party shall give 60 days written notice before terminating.\n9.3 Vendor shall keep all Client data confidential for five years after termination.",
+    "obligations": [
+      "Client shall pay each invoice within 30 days of receipt",
+      "Vendor shall deliver the Phase 1 report by 2026-03-15",
+      "Either party must give 60 days written notice before terminating",
+      "Vendor shall keep Client data confidential for five years after termination"
+    ]
+  }
+]

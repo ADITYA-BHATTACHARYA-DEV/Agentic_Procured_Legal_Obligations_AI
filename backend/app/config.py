@@ -1,0 +1,38 @@
+from pathlib import Path
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+BASE_DIR = Path(__file__).resolve().parents[1]
+
+
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(env_file=BASE_DIR / ".env", extra="ignore")
+
+    ollama_host: str = "http://localhost:11434"
+    llm_model: str = "llama3.1"
+    embed_model: str = "nomic-embed-text"
+    chunk_size: int = 1000
+    chunk_overlap: int = 150
+    top_k: int = 5
+    ocr_dpi: int = 200
+    num_ctx: int = 4096          # smaller context = much faster on CPU
+    keep_alive: str = "30m"      # keep the model loaded between calls
+    extract_window: int = 6000   # chars per extraction call (bigger = fewer calls)
+    extract_max_tokens: int = 1024
+    data_dir: Path = BASE_DIR / "data"
+
+    @property
+    def upload_dir(self) -> Path:
+        return self.data_dir / "uploads"
+
+    @property
+    def chroma_dir(self) -> Path:
+        return self.data_dir / "chroma"
+
+    @property
+    def sqlite_path(self) -> Path:
+        return self.data_dir / "obligo.db"
+
+
+settings = Settings()
+for p in (settings.data_dir, settings.upload_dir, settings.chroma_dir):
+    p.mkdir(parents=True, exist_ok=True)

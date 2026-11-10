@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Obligo — know what you've signed</title>
+  <link rel="icon" href="assets/logo.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+</head>
+<body>
+
+<!-- ============ SCREEN 1 : LOADING / UPLOAD ============ -->
+<main id="screen-start" class="screen start">
+  <header class="brand">
+    <img src="assets/logo.svg" alt="" width="40" height="40" />
+    <span class="brand-name">Obligo</span>
+  </header>
+
+  <section class="start-main">
+    <h1>Know what you've signed, and when it's due.</h1>
+    <p class="lede">Upload a contract. Obligo reads it, lists every obligation with an owner and a deadline, and answers your questions about it.</p>
+
+    <label id="dropzone" class="dropzone" tabindex="0">
+      <input id="file-input" type="file" accept=".pdf,image/*" hidden />
+      <span class="dz-title">Upload a contract</span>
+      <span class="dz-hint">Drop a PDF or an image here, or choose a file</span>
+      <span class="btn btn-primary">Choose file</span>
+    </label>
+
+    <ol id="progress" class="progress" hidden>
+      <li data-step="read">Reading the document</li>
+      <li data-step="index">Indexing it for search</li>
+      <li data-step="extract">Finding obligations and deadlines</li>
+    </ol>
+    <p id="start-error" class="error" role="alert" hidden></p>
+  </section>
+
+  <aside class="start-history">
+    <div class="history-head">
+      <h2>Previous documents</h2>
+    </div>
+    <ul id="start-history" class="history-list"></ul>
+    <p id="start-history-empty" class="muted" hidden>Nothing here yet. Your uploaded contracts will appear in this list.</p>
+  </aside>
+</main>
+
+<!-- ============ SCREEN 2 : CHAT WORKSPACE ============ -->
+<div id="screen-chat" class="screen workspace" hidden>
+
+  <!-- LEFT: history -->
+  <aside class="sidebar">
+    <div class="sidebar-top">
+      <div class="brand small"><img src="assets/logo.svg" alt="" width="28" height="28" /><span class="brand-name">Obligo</span></div>
+      <button id="new-chat" class="btn btn-primary btn-block">New document</button>
+    </div>
+
+    <nav class="sidebar-scroll" aria-label="Chat history">
+      <h3>Chats</h3>
+      <ul id="chat-list" class="chat-list"></ul>
+      <button id="toggle-archived" class="link-btn">Show archived</button>
+      <ul id="archived-list" class="chat-list" hidden></ul>
+    </nav>
+
+    <div class="profile">
+      <button id="avatar" class="avatar" title="Change profile photo" aria-label="Change profile photo"><img id="avatar-img" alt="" /></button>
+      <input id="avatar-input" type="file" accept="image/*" hidden />
+      <div class="profile-text">
+        <strong id="profile-name">You</strong>
+        <span class="muted">Contract owner</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- CENTRE: chat -->
+  <section class="chat">
+    <header class="chat-head">
+      <h2 id="chat-title">Chat</h2>
+      <span id="doc-meta" class="muted"></span>
+    </header>
+
+    <div id="messages" class="messages" aria-live="polite"></div>
+
+    <div id="suggestions" class="suggestions"></div>
+    <form id="composer" class="composer">
+      <textarea id="input" rows="1" placeholder="Ask about this contract" aria-label="Ask about this contract"></textarea>
+      <button class="btn btn-primary" id="send" type="submit">Send</button>
+    </form>
+  </section>
+
+  <!-- RIGHT: document -->
+  <aside class="doc-panel">
+    <div class="tabs" role="tablist">
+      <button class="tab active" data-tab="document" role="tab">Document</button>
+      <button class="tab" data-tab="obligations" role="tab">Obligations</button>
+    </div>
+    <div id="tab-document" class="tab-body viewer"></div>
+    <div id="tab-obligations" class="tab-body obligations" hidden></div>
+  </aside>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
