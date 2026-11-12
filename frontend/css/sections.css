@@ -170,3 +170,7 @@
   .band .marquee-track { animation: none !important; } .band { overflow-x: auto; }
   .hl { background-size: 100% 100%; } .ring-fg { stroke-dashoffset: 20; } .term p { max-width: 32ch; }
 }
+
+/* Guard: the landing page is a normal vertical stack. The ID selector wins over any older .start grid rule. */
+#screen-start { display: block; padding: 0; height: auto; }
+#screen-start > .lp, #screen-start > .band { grid-column: 1 / -1; }

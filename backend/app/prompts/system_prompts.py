@@ -66,3 +66,52 @@ QUERY_CLASSIFIER_PROMPT = """Classify the user's question about a contract into 
 Return ONLY JSON: {{"type": "legal|obligation|summary|general"}}
 
 Question: {question}"""
+
+
+# ---------------------------------------------------------------------------
+# Handwriting / multilingual pages (read by the on-prem vision model, then by Llama)
+# ---------------------------------------------------------------------------
+HANDWRITING_TRANSCRIBE_PROMPT = """You are an expert at reading pages that mix printed text and handwriting, in any language or script.
+Transcribe EXACTLY what is written, in reading order, in the ORIGINAL language and script.
+Do not translate inside "printed" or "handwritten". Do not correct spelling or complete missing words.
+Write [?] for any word or number you cannot read with confidence. For dates, amounts and
+numbers, NEVER guess a digit: write [?] instead.
+Put typed text in "printed" and pen/pencil writing (notes, margin comments, annotations) in "handwritten".
+
+Return ONLY valid JSON:
+{
+  "printed": "all printed text, or empty string",
+  "handwritten": "all handwritten text, or empty string",
+  "language": "English name of the main language of the handwriting (or of the printed text if there is no handwriting)",
+  "language_code": "BCP-47 code such as en, hi, kn, ta, te, ml, bn, ar",
+  "script": "Latin | Devanagari | Kannada | Tamil | Telugu | Malayalam | Bengali | Gujarati | Gurmukhi | Odia | Arabic | Cyrillic | Han | Hiragana/Katakana | Hangul | Thai | Hebrew | Greek | Other",
+  "legibility": "good | fair | poor",
+  "translation_en": "faithful English translation of ALL the text on the page, or null if it is already English",
+  "uncertain": ["each word or phrase you were unsure about"]
+}"""
+
+HANDWRITING_REREAD_PROMPT = """This is a cleaned-up copy of a scanned page that may contain handwriting in any language.
+Read every word again carefully and transcribe ALL text (printed and handwritten) in reading
+order, in the original language and script. Do not translate or correct anything.
+Write [?] for anything you cannot read.
+
+Return ONLY valid JSON: {"text": "the full transcription"}"""
+
+TRANSLATE_PROMPT = """Translate the text below into English, faithfully. Keep names, numbers and dates exactly as written.
+Return ONLY valid JSON: {"translation_en": "..."}"""
+
+NOTE_ANALYSIS_PROMPT = """You are a contract analyst reviewing a handwritten note found on a contract page.
+Today's date is {today}. You are given the printed context, the handwritten note in its original
+language, and an English translation of the page. Work from the English translation when the note
+is not in English. Use ONLY what is written; never invent clauses, dates or parties.
+
+Return ONLY valid JSON:
+{{
+  "note_kind": "amendment | instruction | reminder | question | approval | signature | other",
+  "summary": "one or two plain-English sentences saying what the note says",
+  "affects_clause": "clause or section number it refers to, or null",
+  "modifies_terms": true or false (true if the note changes, adds or removes a contract term),
+  "dates": [{{"text": "date as written", "iso": "YYYY-MM-DD or null"}}],
+  "action_items": [{{"description": "...", "owner": "...", "deadline": "ISO date or relative phrase or null"}}],
+  "confidence": "high | medium | low"
+}}"""

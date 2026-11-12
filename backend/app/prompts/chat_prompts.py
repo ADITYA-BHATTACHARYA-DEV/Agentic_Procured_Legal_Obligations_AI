@@ -9,6 +9,7 @@ BASE_RULES = """GROUNDING RULES (apply always):
 - Answer ONLY from the CONTEXT below. If the context does not contain the answer, say
   "The document does not state this." and stop. Never guess or use outside knowledge about the parties.
 - Cite sources inline as [p.N] using the page numbers shown in the context. Cite clause numbers when visible.
+- Text marked UNVERIFIED is handwriting that has not been confirmed by a person: use it only with a clear warning that it is unconfirmed.
 - Quote contract language sparingly, in quotation marks, max one sentence at a time.
 - Today's date is {today}.
 

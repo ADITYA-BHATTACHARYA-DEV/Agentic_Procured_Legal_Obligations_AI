@@ -9,9 +9,9 @@ from ..config import settings
 client = ollama.AsyncClient(host=settings.ollama_host)
 
 
-async def chat_json(system: str, user: str) -> dict:
+async def chat_json(system: str, user: str, model: str | None = None) -> dict:
     resp = await client.chat(
-        model=settings.llm_model,
+        model=model or settings.llm_model,
         messages=[{"role": "system", "content": system}, {"role": "user", "content": user}],
         format="json",
         keep_alive=settings.keep_alive,
@@ -35,6 +35,21 @@ async def chat_stream(messages: list[dict], temperature: float = 0.2, num_ctx: i
         token = part["message"]["content"]
         if token:
             yield token
+
+
+async def vision_json(prompt: str, image: bytes, temperature: float = 0.0) -> dict:
+    """Ask the on-prem vision model (Gemma) about an image; returns parsed JSON or {}."""
+    resp = await client.chat(
+        model=settings.vision_model,
+        messages=[{"role": "user", "content": prompt, "images": [image]}],
+        format="json",
+        keep_alive=settings.keep_alive,
+        options={"temperature": temperature, "num_ctx": settings.num_ctx, "num_predict": settings.vision_max_tokens},
+    )
+    try:
+        return json.loads(resp["message"]["content"])
+    except json.JSONDecodeError:
+        return {}
 
 
 async def embed(texts: list[str]) -> list[list[float]]:

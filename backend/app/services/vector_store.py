@@ -37,5 +37,20 @@ async def search(document_id: str | None, query: str, k: int, document_ids: list
     ]
 
 
+async def replace_page(document_id: str, page: int, chunks: list[dict]) -> None:
+    """Swap one page's chunks (after a handwriting re-read or a human correction)."""
+    _col.delete(where={"$and": [{"document_id": document_id}, {"page": page}]})
+    chunks = [c for c in chunks if c["text"].strip()]
+    if not chunks:
+        return
+    vectors = await llm.embed([c["text"] for c in chunks])
+    _col.add(
+        ids=[f"{document_id}:p{page}:{i}" for i in range(len(chunks))],
+        documents=[c["text"] for c in chunks],
+        embeddings=vectors,
+        metadatas=[{"document_id": document_id, "page": page} for _ in chunks],
+    )
+
+
 def delete_document(document_id: str) -> None:
     _col.delete(where={"document_id": document_id})

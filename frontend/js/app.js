@@ -163,6 +163,7 @@ async function openChat(chatId) {
 
   renderViewer(doc);
   doc.status === "processing" ? watchProcessing(doc) : loadObligations();
+  loadNotes();
   renderSidebar();
 }
 
@@ -175,7 +176,7 @@ function watchProcessing(doc) {
     const d = await api.getDoc(doc.id).catch(() => null);
     if (d && d.status === "ready") {
       $("#doc-meta").textContent = `${d.doc_type || "Document"} · ${d.page_count === 1 ? "1 page" : d.page_count + " pages"}`;
-      $(".msg.intro")?.remove(); addIntro(d); loadObligations(); renderSidebar(); return;
+      $(".msg.intro")?.remove(); addIntro(d); loadObligations(); loadNotes(); renderSidebar(); return;
     }
     pollTimer = setTimeout(tick, 4000);
   };
@@ -275,18 +276,26 @@ input.addEventListener("input", autoGrow);
 input.addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); $("#composer").requestSubmit(); } });
 
 /* ---------- right panel ---------- */
-function renderViewer(doc) {
+let viewerUrl = null;
+async function renderViewer(doc) {
   const v = $("#tab-document");
-  const url = api.fileUrl(doc.id);
-  v.innerHTML = (doc.mime || "").includes("pdf") || doc.filename.toLowerCase().endsWith(".pdf")
-    ? `<iframe src="${url}#toolbar=0&navpanes=0" title="${esc(doc.filename)}"></iframe>`
-    : `<div class="img-wrap"><img src="${url}" alt="${esc(doc.filename)}" /></div>`;
+  v.innerHTML = `<p class="muted pad">Decrypting the document…</p>`;
+  try {
+    const blob = await api.fileBlob(doc.id);          // decrypted by the server, sent over the (ideally HTTPS) connection
+    if (viewerUrl) URL.revokeObjectURL(viewerUrl);
+    viewerUrl = URL.createObjectURL(blob);
+    const isPdf = (doc.mime || "").includes("pdf") || doc.filename.toLowerCase().endsWith(".pdf");
+    v.innerHTML = isPdf
+      ? `<iframe src="${viewerUrl}#toolbar=0&navpanes=0" title="${esc(doc.filename)}"></iframe>`
+      : `<div class="img-wrap"><img src="${viewerUrl}" alt="${esc(doc.filename)}" /></div>`;
+  } catch (e) {
+    v.innerHTML = `<p class="error pad">Could not open the document: ${esc(e.message)}</p>`;
+  }
 }
 
 document.querySelectorAll(".tab").forEach(t => t.onclick = () => {
   document.querySelectorAll(".tab").forEach(x => x.classList.toggle("active", x === t));
-  show($("#tab-document"), t.dataset.tab === "document");
-  show($("#tab-obligations"), t.dataset.tab === "obligations");
+  ["document", "obligations", "handwriting"].forEach(name => show($("#tab-" + name), t.dataset.tab === name));
 });
 
 async function loadObligations() {

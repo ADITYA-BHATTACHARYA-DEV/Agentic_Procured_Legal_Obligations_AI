@@ -43,6 +43,19 @@ CREATE TABLE IF NOT EXISTS tags (
     document_id TEXT REFERENCES documents(id) ON DELETE CASCADE, tag TEXT,
     PRIMARY KEY (document_id, tag)
 );
+CREATE TABLE IF NOT EXISTS handwriting_notes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    document_id TEXT REFERENCES documents(id) ON DELETE CASCADE, page INTEGER,
+    printed TEXT, handwritten TEXT, translation_en TEXT,
+    language TEXT, language_code TEXT, script TEXT, script_detected TEXT, script_match INTEGER,
+    legibility TEXT, agreement REAL, flagged TEXT, status TEXT, analysis TEXT,
+    actions_applied INTEGER DEFAULT 0, created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (document_id, page)
+);
+CREATE TABLE IF NOT EXISTS audit_log (
+    id INTEGER PRIMARY KEY AUTOINCREMENT, ts TEXT DEFAULT CURRENT_TIMESTAMP,
+    actor TEXT, action TEXT, target TEXT, detail TEXT, ip TEXT
+);
 CREATE TABLE IF NOT EXISTS notifications (
     id INTEGER PRIMARY KEY AUTOINCREMENT, task_id INTEGER, days_before INTEGER,
     channel TEXT, recipient TEXT, message TEXT, status TEXT,
@@ -53,7 +66,8 @@ CREATE TABLE IF NOT EXISTS notifications (
 # Columns added after the first release. Applied to old AND new databases.
 MIGRATIONS = {
     "documents": [("effective_date", "TEXT"), ("term_months", "INTEGER"), ("auto_renews", "INTEGER"),
-                  ("notice_days", "INTEGER"), ("renewal_date", "TEXT"), ("governing_law", "TEXT")],
+                  ("notice_days", "INTEGER"), ("renewal_date", "TEXT"), ("governing_law", "TEXT"),
+                  ("encrypted", "INTEGER DEFAULT 0"), ("wrapped_key", "TEXT")],
     "obligations": [("kind", "TEXT DEFAULT 'obligation'"), ("due_date", "TEXT"),
                     ("recurrence", "TEXT"), ("amount", "TEXT")],
     "tasks": [("assignee_email", "TEXT")],

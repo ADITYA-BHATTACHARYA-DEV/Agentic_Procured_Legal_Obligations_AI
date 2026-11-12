@@ -20,6 +20,19 @@ class Settings(BaseSettings):
     extract_max_tokens: int = 1024
     data_dir: Path = BASE_DIR / "data"
 
+    # handwriting / multilingual vision (on-prem)
+    vision_enabled: bool = True
+    vision_model: str = "gemma3:4b"
+    vision_verify_passes: int = 2          # 2 = read twice and compare; 1 = every note needs human review
+    vision_min_agreement: float = 0.85
+    vision_max_tokens: int = 2048
+
+    # security
+    obligo_master_key: str = ""
+    obligo_api_token: str = ""
+    allowed_origins: str = "*"
+    encrypt_at_rest: bool = True
+
     # reminders
     reminder_hour: int = 9
     default_notify_email: str = ""
@@ -35,6 +48,10 @@ class Settings(BaseSettings):
         return self.data_dir / "uploads"
 
     @property
+    def tmp_dir(self) -> Path:
+        return self.data_dir / "tmp"
+
+    @property
     def chroma_dir(self) -> Path:
         return self.data_dir / "chroma"
 
@@ -44,5 +61,5 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
-for p in (settings.data_dir, settings.upload_dir, settings.chroma_dir):
+for p in (settings.data_dir, settings.upload_dir, settings.chroma_dir, settings.tmp_dir):
     p.mkdir(parents=True, exist_ok=True)
