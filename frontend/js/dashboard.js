@@ -42,7 +42,7 @@ function showDashTab(name) {
   dashTab = name;
   document.querySelectorAll(".dtab").forEach(t => t.classList.toggle("active", t.dataset.dtab === name));
   document.querySelectorAll(".dpane").forEach(p => show(p, p.id === `dtab-${name}`));
-  ({ tasks: loadTasksTab, library: loadLibrary, compare: loadCompareSelects, team: loadTeam }[name] || (() => {}))()
+  ({ tasks: loadTasksTab, library: loadLibrary, compare: loadCompareSelects, team: loadTeam, security: loadSecurity }[name] || (() => {}))()
     ?.catch?.(e => flash(`Could not load: ${e.message}. Is the backend running?`, true));
 }
 
@@ -117,7 +117,10 @@ async function openDocChat(docId) {
 
 ["f-owner", "f-priority", "f-status", "f-doc"].forEach(id => $("#" + id).onchange = loadTaskTable);
 $("#f-q").oninput = () => { clearTimeout(loadTaskTable.t); loadTaskTable.t = setTimeout(loadTaskTable, 250); };
-$("#btn-ics").onclick = () => { window.location.href = api.icsUrl(filters()); flash("Calendar file downloading. Import it into Google Calendar, Outlook or Apple Calendar."); };
+$("#btn-ics").onclick = async () => {
+  try { await api.downloadIcs(filters()); flash("Calendar file downloaded. Import it into Google Calendar, Outlook or Apple Calendar."); }
+  catch (e) { flash(`Could not export: ${e.message}`, true); }
+};
 $("#btn-remind").onclick = async () => {
   try { const r = await api.runReminders(); flash(`Checked ${r.checked} dated tasks and created ${r.created} new reminder${r.created === 1 ? "" : "s"}.`); }
   catch (e) { flash(`Reminder check failed: ${e.message}`, true); }

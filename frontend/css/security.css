@@ -1,0 +1,20 @@
+.stat small { font-size: 12px; line-height: 1.35; margin-top: 2px; }
+.lab { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }
+.lab-card { display: grid; gap: 8px; padding: 20px; border: 1px solid var(--line); border-radius: 20px; background: var(--glass); backdrop-filter: blur(10px); }
+.lab-card h4 { font: 400 24px var(--serif); margin: 0 0 4px; }
+.lab-card label { font: 500 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-top: 6px; }
+.lab-card input[type="password"], .lab-card input[type="file"] { padding: 9px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+.lab-card .btn { justify-self: start; margin-top: 8px; }
+.tri { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 14px 0 4px; }
+.tri figure { margin: 0; display: grid; gap: 6px; }
+.tri img, .recovered { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 12px; border: 1px solid var(--line); background: var(--paper); }
+.recovered { aspect-ratio: auto; max-height: 340px; object-fit: contain; margin-top: 10px; }
+.tri img.noise { image-rendering: pixelated; }
+.tri figcaption { font: 500 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); text-align: center; }
+.file-tile { display: grid; place-items: center; aspect-ratio: 1; padding: 10px; text-align: center; font-size: 13px; word-break: break-all; border: 1px dashed var(--line); border-radius: 12px; }
+.metrics { width: 100%; border-collapse: collapse; font-size: 13.5px; margin: 8px 0; }
+.metrics th { text-align: left; font: 500 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 6px 8px; border-bottom: 1px solid var(--line); }
+.metrics td { padding: 7px 8px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+.metrics .chk { display: inline-block; }
+.n-hint { font-size: 12.5px; line-height: 1.5; }
+@media (max-width: 980px) { .lab { grid-template-columns: 1fr; } }
