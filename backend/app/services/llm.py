@@ -23,13 +23,13 @@ async def chat_json(system: str, user: str) -> dict:
         return {}
 
 
-async def chat_stream(messages: list[dict], temperature: float = 0.2) -> AsyncIterator[str]:
+async def chat_stream(messages: list[dict], temperature: float = 0.2, num_ctx: int | None = None) -> AsyncIterator[str]:
     stream = await client.chat(
         model=settings.llm_model,
         messages=messages,
         stream=True,
         keep_alive=settings.keep_alive,
-        options={"temperature": temperature, "num_ctx": settings.num_ctx},
+        options={"temperature": temperature, "num_ctx": num_ctx or settings.num_ctx},
     )
     async for part in stream:
         token = part["message"]["content"]

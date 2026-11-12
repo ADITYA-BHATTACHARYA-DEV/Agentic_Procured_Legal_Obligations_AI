@@ -17,6 +17,7 @@ const TYPE_LABEL = { legal: "Legal analysis", obligation: "Obligations", summary
 function go(screen) {
   show($("#screen-start"), screen === "start");
   show($("#screen-chat"), screen === "chat");
+  show($("#screen-dash"), screen === "dash");
 }
 
 /* ---------- screen 1 : upload + history ---------- */
@@ -36,7 +37,7 @@ async function handleFile(file) {
   if (!file) return;
   const err = $("#start-error");
   show(err, false);
-  show($("#dropzone"), false);
+  show($("#start-input"), false);
   const prog = $("#progress");
   show(prog, true);
   const steps = [...prog.children];
@@ -52,7 +53,7 @@ async function handleFile(file) {
   } catch (e) {
     err.textContent = `Upload failed: ${e.message}. Check that the backend and Ollama are running.`;
     show(err, true);
-    show($("#dropzone"), true);
+    show($("#start-input"), true);
   } finally {
     clearInterval(timer);
     show(prog, false);
@@ -109,7 +110,7 @@ document.addEventListener("click", async e => {
       await api.patchChat(id, { archived: !isArchivedItem });
       if (id === state.chatId && !isArchivedItem) return resetToStart();
     } else if (act.dataset.act === "delete") {
-      if (!confirm("Delete this chat and its document? This cannot be undone.")) return;
+      if (!confirm("Delete this chat? The contract itself stays in your Library.")) return;
       await api.deleteChat(id);
       if (id === state.chatId) return resetToStart();
     }
@@ -124,7 +125,7 @@ $("#new-chat").onclick = resetToStart;
 async function resetToStart() {
   state.chatId = null;
   go("start");
-  show($("#dropzone"), true);
+  show($("#start-input"), true);
   await renderStartHistory();
 }
 

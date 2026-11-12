@@ -7,8 +7,13 @@
   <link rel="icon" href="assets/logo.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="css/dashboard.css" />
+  <link rel="stylesheet" href="css/landing.css" />
+  <link rel="stylesheet" href="css/sections.css" />
+  <link rel="stylesheet" href="css/handwriting.css" />
+  <link rel="stylesheet" href="css/security.css" />
   <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
 </head>
@@ -16,21 +21,38 @@
 
 <!-- ============ SCREEN 1 : LOADING / UPLOAD ============ -->
 <main id="screen-start" class="screen start">
-  <header class="brand">
-    <img src="assets/logo.svg" alt="" width="40" height="40" />
-    <span class="brand-name">Obligo</span>
+  <div class="scroll-progress" aria-hidden="true"></div>
+  <section class="hero">
+  <div class="orb orb-a" aria-hidden="true"></div>
+  <div class="orb orb-b" aria-hidden="true"></div>
+  <canvas id="flow-bg" class="flow-bg" aria-hidden="true"></canvas>
+  <div class="grain" aria-hidden="true"></div>
+
+  <header class="start-nav">
+    <div class="brand"><img src="assets/logo.svg" alt="" width="44" height="44" /><span class="brand-name">Obligo</span></div>
+    <span class="status-pill"><i class="dot"></i>Private and local, powered by Llama 3.1</span>
   </header>
 
   <section class="start-main">
-    <h1>Know what you've signed, and when it's due.</h1>
-    <p class="lede">Upload a contract. Obligo reads it, lists every obligation with an owner and a deadline, and answers your questions about it.</p>
+    <p class="eyebrow">Contract obligation tracking</p>
+    <h1>Find the <em>order</em><br />in the fine print.</h1>
+    <p class="lede">Upload a contract. Obligo reads it, lists every obligation with an owner and a deadline, warns you before a renewal window closes, and answers your questions with page citations.</p>
 
-    <label id="dropzone" class="dropzone" tabindex="0">
-      <input id="file-input" type="file" accept=".pdf,image/*" hidden />
-      <span class="dz-title">Upload a contract</span>
-      <span class="dz-hint">Drop a PDF or an image here, or choose a file</span>
-      <span class="btn btn-primary">Choose file</span>
-    </label>
+    <div id="start-input">
+      <label id="dropzone" class="dropzone" tabindex="0">
+        <input id="file-input" type="file" accept=".pdf,image/*" hidden />
+        <span class="dz-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M5 20h14"/></svg></span>
+        <span class="dz-text">
+          <span class="dz-title">Drop a contract to begin</span>
+          <span class="dz-hint">PDF or image. Scanned pages are read with OCR.</span>
+        </span>
+      </label>
+      <div class="start-actions">
+        <button id="btn-upload" type="button" class="btn btn-primary btn-lg"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M5 20h14"/></svg>Upload PDF / image</button>
+        <button id="btn-history" type="button" class="btn btn-lg" aria-expanded="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Previous history</button>
+        <button id="btn-dashboard" type="button" class="btn btn-lg"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="4" rx="1.5"/><rect x="13" y="11" width="7" height="9" rx="1.5"/><rect x="4" y="14" width="7" height="6" rx="1.5"/></svg>Dashboard</button>
+      </div>
+    </div>
 
     <ol id="progress" class="progress" hidden>
       <li data-step="read">Reading the document</li>
@@ -47,6 +69,193 @@
     <ul id="start-history" class="history-list"></ul>
     <p id="start-history-empty" class="muted" hidden>Nothing here yet. Your uploaded contracts will appear in this list.</p>
   </aside>
+
+  <div class="marquee" aria-label="What Obligo does and what it reads">
+    <div class="marquee-row feature">
+      <div class="marquee-track">
+        <span class="m-item">Obligations extracted</span><span class="m-item">Deadlines tracked</span>
+        <span class="m-item">Auto-renewals caught</span><span class="m-item">Owners assigned</span>
+        <span class="m-item">Reminders at 30, 7 and 1 days</span><span class="m-item">Every answer cited</span>
+        <span class="m-item">Contracts compared</span><span class="m-item">Runs on your own machine</span>
+      </div>
+    </div>
+    <div class="marquee-row stack reverse">
+      <div class="marquee-track">
+        <span class="m-item">PDF</span><span class="m-item">Scanned images</span><span class="m-item">MSA</span>
+        <span class="m-item">NDA</span><span class="m-item">SaaS</span><span class="m-item">Employment</span>
+        <span class="m-item">Leases</span><span class="m-item">Services</span><span class="m-item">Llama 3.1</span>
+        <span class="m-item">ChromaDB</span><span class="m-item">SQLite</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+  <!-- ===== 1. text to tasks ===== -->
+  <section class="lp" id="sec-extract">
+    <i class="deco deco-a" data-parallax="-.12" aria-hidden="true"></i>
+    <div class="lp-head" data-reveal="up">
+      <p class="eyebrow">From text to tasks</p>
+      <h2>Every duty hiding in the paragraph, <em>found</em>.</h2>
+      <p>Obligo reads each clause, works out who must do what and by when, and turns it into a task you can track.</p>
+    </div>
+    <div class="hl-demo" data-reveal="zoom">
+      <div class="doc-card">
+        <div class="doc-bar"><i></i><i></i><i></i><span>SampleAgreement.pdf</span></div>
+        <div class="doc-body">
+          <p><b>3.1</b> The Client shall pay each invoice within <mark class="hl" style="--i:0">thirty (30) days of receipt</mark>, failing which interest accrues monthly.</p>
+          <p><b>4.2</b> The Vendor shall <mark class="hl" style="--i:1">deliver the Phase 1 report by 15 March 2027</mark> and shall provide a status update <mark class="hl" style="--i:2">every quarter</mark>.</p>
+          <p><b>8.1</b> This Agreement renews for successive twelve-month terms unless either party gives <mark class="hl" style="--i:3">sixty (60) days written notice</mark> before the end of the then-current term.</p>
+        </div>
+      </div>
+      <div class="flow-arrow" aria-hidden="true"><svg viewBox="0 0 80 24" width="80" height="24"><path d="M2 12h70m-10-9 10 9-10 9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <ul class="task-col">
+        <li style="--i:0"><span class="pri pri-high">high</span><div><strong>Pay each invoice</strong><small>Due 30 days after receipt · Client</small></div></li>
+        <li style="--i:1"><span class="pri pri-medium">medium</span><div><strong>Deliver the Phase 1 report</strong><small>Due 15 Mar 2027 · Vendor</small></div></li>
+        <li style="--i:2"><span class="pri pri-low">low</span><div><strong>Send a status update</strong><small><span class="pill">quarterly</span> Repeats as separate tasks · Vendor</small></div></li>
+        <li style="--i:3"><span class="pri pri-high">high</span><div><strong>Notice of non-renewal</strong><small><span class="pill pill-warn">renewal</span> 60 days before the term ends</small></div></li>
+      </ul>
+    </div>
+    <p class="caption">Illustrative sample text</p>
+  </section>
+
+  <!-- ===== 2. how it works ===== -->
+  <section class="lp" id="sec-steps">
+    <div class="lp-head" data-reveal="up">
+      <p class="eyebrow">How it works</p>
+      <h2>From upload to tracked, in <em>four</em> steps.</h2>
+    </div>
+    <div class="steps" data-stagger>
+      <article class="step" data-reveal="left"><div class="s-ico"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M5 20h14"/></svg></div><p class="s-num">01</p><h3>Upload</h3><p>Drop a PDF or an image. Scanned pages are read with OCR.</p></article>
+      <article class="step" data-reveal="up"><div class="s-ico"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></div><p class="s-num">02</p><h3>Read and index</h3><p>The text is split, embedded and stored on your machine so answers can cite pages.</p></article>
+      <article class="step" data-reveal="up"><div class="s-ico"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.5-4 3.5-6 6.5-6s6 2 6.5 6"/><path d="M16 5.5a3.5 3.5 0 0 1 0 5"/><path d="M18 14.5c2 .7 3.2 2.4 3.5 5.5"/></svg></div><p class="s-num">03</p><h3>Extract and assign</h3><p>Obligations and renewal windows are pulled out, dated in code and routed to owners.</p></article>
+      <article class="step" data-reveal="right"><div class="s-ico"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 21h4"/></svg></div><p class="s-num">04</p><h3>Track and remind</h3><p>Tasks, reminders at 30, 7 and 1 days, and a calendar file keep nothing from slipping.</p></article>
+    </div>
+  </section>
+
+  <!-- ===== 3. features ===== -->
+  <section class="lp" id="sec-features">
+    <i class="deco deco-b" data-parallax=".1" aria-hidden="true"></i>
+    <div class="lp-head" data-reveal="up">
+      <p class="eyebrow">What's inside</p>
+      <h2>Everything around the <em>obligation</em>.</h2>
+    </div>
+    <div class="bento" data-stagger>
+      <article class="card s4" data-reveal="left">
+        <div class="card-gfx"><div class="scan"></div>
+          <ul class="ex-list">
+            <li style="--i:0"><span class="pri pri-high">high</span><span>Pay each invoice within 30 days of receipt</span><span class="ex-o">Client</span></li>
+            <li style="--i:1"><span class="pri pri-medium">medium</span><span>Deliver the Phase 1 report</span><span class="ex-o">Vendor</span></li>
+            <li style="--i:2"><span class="pri pri-high">high</span><span>Give notice to stop renewal</span><span class="ex-o">Client</span></li>
+            <li style="--i:3"><span class="pri pri-low">low</span><span>Quarterly usage report <span class="pill">×4</span></span><span class="ex-o">Vendor</span></li>
+          </ul></div>
+        <h3>Obligations, extracted and owned</h3>
+        <p>Relative dates like “30 days after the Effective Date” are computed in code, recurring duties are split into repeating tasks, and each one is routed to a named person.</p>
+      </article>
+
+      <article class="card s2" data-reveal="right">
+        <div class="card-gfx"><div class="ring">
+          <svg viewBox="0 0 120 120" aria-hidden="true"><defs><linearGradient id="ringgrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--accent)"/><stop offset="1" style="stop-color:var(--amber)"/></linearGradient></defs>
+            <circle class="ring-bg" cx="60" cy="60" r="50"/><circle class="ring-fg" cx="60" cy="60" r="50" pathLength="100"/></svg>
+          <div class="ring-label"><strong id="ring-num">60</strong><span>days to notice</span></div></div></div>
+        <h3>Renewal guard</h3>
+        <p>Spots auto-renewals and the last day to stop them, before it costs you a year.</p>
+      </article>
+
+      <article class="card s3" data-reveal="left">
+        <div class="card-gfx"><div class="ladder"><div class="l-track"><i class="l-pulse"></i></div>
+          <div class="l-nodes">
+            <div class="l-node" style="--i:0"><i>30</i><span>days</span></div><div class="l-node" style="--i:1"><i>7</i><span>days</span></div>
+            <div class="l-node" style="--i:2"><i>1</i><span>day</span></div><div class="l-node due" style="--i:3"><i>!</i><span>due</span></div>
+          </div></div></div>
+        <h3>A reminder ladder</h3>
+        <p>Alerts at 30, 7 and 1 days, and again when a task is overdue. Email and Slack are optional.</p>
+      </article>
+
+      <article class="card s3" data-reveal="right">
+        <div class="card-gfx"><div class="cal" id="cal" aria-hidden="true"></div></div>
+        <h3>Deadlines in your calendar</h3>
+        <p>Export every dated task as an .ics file for Google Calendar, Outlook or Apple Calendar.</p>
+      </article>
+
+      <article class="card s2" data-reveal="up">
+        <div class="card-gfx">
+          <svg class="graph" viewBox="0 0 240 170" aria-hidden="true">
+            <g class="edges"><line class="edge" x1="120" y1="85" x2="36" y2="34"/><line class="edge" x1="120" y1="85" x2="204" y2="30"/><line class="edge" x1="120" y1="85" x2="26" y2="120"/><line class="edge" x1="120" y1="85" x2="214" y2="124"/><line class="edge" x1="120" y1="85" x2="120" y2="152"/></g>
+            <g class="gn"><circle class="halo" style="--i:0" cx="36" cy="34" r="9"/><circle class="halo" style="--i:1" cx="204" cy="30" r="9"/><circle class="halo" style="--i:2" cx="26" cy="120" r="9"/><circle class="halo" style="--i:3" cx="214" cy="124" r="9"/><circle class="halo" style="--i:4" cx="120" cy="152" r="9"/>
+              <circle class="nd" cx="36" cy="34" r="8"/><circle class="nd" cx="204" cy="30" r="8"/><circle class="nd" cx="26" cy="120" r="8"/><circle class="nd" cx="214" cy="124" r="8"/><circle class="nd" cx="120" cy="152" r="8"/>
+              <circle class="nc" cx="120" cy="85" r="22"/><text x="120" y="89" text-anchor="middle">Ask all</text></g>
+          </svg></div>
+        <h3>Ask across contracts</h3>
+        <p>“Which contracts renew this quarter?” answered from the whole library.</p>
+      </article>
+
+      <article class="card s2" data-reveal="up">
+        <div class="card-gfx"><div class="cmp">
+          <div class="cmp-row" style="--i:0"><span>Notice</span><b>60 days</b><b>30 days</b><em class="pill pill-warn">Differs</em></div>
+          <div class="cmp-row" style="--i:1"><span>Renews</span><b>Yes</b><b>Yes</b><em class="pill">Same</em></div>
+          <div class="cmp-row" style="--i:2"><span>Liability</span><b>12 mo fees</b><b>No cap</b><em class="pill pill-warn">Differs</em></div>
+        </div></div>
+        <h3>Compare side by side</h3>
+        <p>Two contracts, one table of the differences that matter.</p>
+      </article>
+
+      <article class="card s2" data-reveal="right">
+        <div class="card-gfx"><div class="term" aria-hidden="true">
+          <p style="--i:0"><span class="pr">$</span> ollama run llama3.1</p><p class="ok" style="--i:1">model ready</p>
+          <p class="ok" style="--i:2">contracts indexed locally</p><p style="--i:3" class="dim">nothing leaves this machine</p><span class="cursor"></span></div></div>
+        <h3>Private by design</h3>
+        <p>Llama 3.1, ChromaDB and SQLite all run on your own computer.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ===== 4. live product preview ===== -->
+  <section class="lp" id="sec-demo">
+    <div class="lp-head" data-reveal="up">
+      <p class="eyebrow">See it work</p>
+      <h2>Ask in plain English. Get a <em>cited</em> answer.</h2>
+      <p>Legal questions get a structured, cautious answer. Simple questions get a short one. Every answer points to its page.</p>
+    </div>
+    <div class="app-mock" id="demo" data-reveal="flip">
+      <aside class="am-side"><div class="am-brand"><img src="assets/logo.svg" alt="" width="22" height="22" /><b>Obligo</b></div>
+        <div class="am-item cur"><i></i><span>Vendor MSA</span></div><div class="am-item"><i></i><span>Office lease</span></div><div class="am-item"><i></i><span>Employment offer</span></div>
+        <div class="am-me"><span class="am-av"></span><small>You</small></div></aside>
+      <div class="am-chat">
+        <div class="msg user"><div class="bubble d-q"></div></div>
+        <div class="msg assistant d-typing" hidden><div class="bubble typing"></div></div>
+        <div class="msg assistant d-ans" hidden>
+          <span class="qtype qt-legal">Legal analysis</span>
+          <div class="bubble"><h4>Short answer</h4><p class="a1"></p><h4>Risks</h4><p class="a2"></p><h4>Suggested next step</h4><p class="a3"></p></div>
+          <div class="sources d-cite" hidden><span class="muted">Sources</span><span class="chip">p.7</span></div>
+        </div>
+      </div>
+      <aside class="am-doc"><div class="am-doc-bar">Document</div>
+        <div class="sk"></div><div class="sk s"></div>
+        <p><b>8.1</b> This Agreement renews for twelve-month terms unless either party gives <mark class="d-hl">sixty (60) days written notice</mark> before the end of the term.</p>
+        <div class="sk"></div><div class="sk s"></div><div class="sk"></div></aside>
+    </div>
+    <p class="caption">Illustrative preview</p>
+  </section>
+
+  <!-- ===== 5. banner ===== -->
+  <div class="band" aria-hidden="true"><div class="marquee-track">
+    <span class="m-item">Assign</span><span class="m-item">Remind</span><span class="m-item">Renew</span><span class="m-item">Compare</span><span class="m-item">Cite</span><span class="m-item">Track</span>
+  </div></div>
+
+  <!-- ===== 6. call to action ===== -->
+  <section class="lp cta-wrap" id="sec-cta">
+    <div class="cta" data-reveal="zoom">
+      <div class="rules" aria-hidden="true"><i style="--i:0"></i><i style="--i:1"></i><i style="--i:2"></i><i style="--i:3"></i><i style="--i:4"></i><i style="--i:5"></i><i style="--i:6"></i><i style="--i:7"></i></div>
+      <h2>Never miss a <em>renewal window</em> again.</h2>
+      <p>Upload your first contract and see every obligation in a minute.</p>
+      <div class="start-actions">
+        <button id="cta-upload" type="button" class="btn btn-primary btn-lg">Upload a contract</button>
+        <button id="cta-dashboard" type="button" class="btn btn-lg">Open the dashboard</button>
+      </div>
+    </div>
+    <footer class="lp-foot"><span>Obligo</span><span>Contract obligation tracking and workflow automation</span></footer>
+  </section>
+
 </main>
 
 <!-- ============ SCREEN 2 : CHAT WORKSPACE ============ -->
@@ -57,6 +266,7 @@
     <div class="sidebar-top">
       <div class="brand small"><img src="assets/logo.svg" alt="" width="28" height="28" /><span class="brand-name">Obligo</span></div>
       <button id="new-chat" class="btn btn-primary btn-block">New document</button>
+      <button id="open-dash" class="btn btn-block">Dashboard</button>
     </div>
 
     <nav class="sidebar-scroll" aria-label="Chat history">
@@ -97,13 +307,138 @@
     <div class="tabs" role="tablist">
       <button class="tab active" data-tab="document" role="tab">Document</button>
       <button class="tab" data-tab="obligations" role="tab">Obligations</button>
+      <button class="tab" data-tab="handwriting" role="tab">Handwriting <span class="tab-count" hidden></span></button>
     </div>
     <div id="tab-document" class="tab-body viewer"></div>
     <div id="tab-obligations" class="tab-body obligations" hidden></div>
+    <div id="tab-handwriting" class="tab-body notes" hidden></div>
   </aside>
+</div>
+
+
+<!-- ============ SCREEN 3 : DASHBOARD ============ -->
+<div id="screen-dash" class="screen dash" hidden>
+  <header class="dash-head">
+    <button id="dash-back" class="btn">Back</button>
+    <div class="brand small"><img src="assets/logo.svg" alt="" width="28" height="28" /><span class="brand-name">Dashboard</span></div>
+    <nav class="dash-tabs" role="tablist">
+      <button class="dtab active" data-dtab="tasks" role="tab">Tasks &amp; deadlines</button>
+      <button class="dtab" data-dtab="library" role="tab">Library</button>
+      <button class="dtab" data-dtab="ask" role="tab">Ask all contracts</button>
+      <button class="dtab" data-dtab="compare" role="tab">Compare</button>
+      <button class="dtab" data-dtab="team" role="tab">Team &amp; alerts</button>
+      <button class="dtab" data-dtab="security" role="tab">Security</button>
+    </nav>
+  </header>
+
+  <main class="dash-body">
+    <p id="dash-msg" class="dash-msg" role="status" hidden></p>
+
+    <section id="dtab-tasks" class="dpane">
+      <div id="stats" class="stats"></div>
+      <h3>Renewal and notice windows</h3>
+      <div id="renewals" class="renewals"></div>
+      <h3>All tasks</h3>
+      <div class="filters">
+        <select id="f-owner" aria-label="Owner"></select>
+        <select id="f-priority" aria-label="Priority">
+          <option value="">Any priority</option><option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option>
+        </select>
+        <select id="f-status" aria-label="Status">
+          <option value="open">Open</option><option value="overdue">Overdue</option><option value="todo">To do</option>
+          <option value="in_progress">In progress</option><option value="done">Done</option><option value="">All</option>
+        </select>
+        <select id="f-doc" aria-label="Document"></select>
+        <input id="f-q" type="search" placeholder="Search tasks" aria-label="Search tasks" />
+        <span class="spacer"></span>
+        <button id="btn-ics" class="btn">Download calendar (.ics)</button>
+        <button id="btn-remind" class="btn">Run reminder check</button>
+      </div>
+      <div class="table-wrap"><table id="task-table"></table></div>
+    </section>
+
+    <section id="dtab-library" class="dpane" hidden>
+      <div class="filters">
+        <input id="lib-q" type="search" placeholder="Filter by name, party or type" aria-label="Filter documents" />
+        <select id="lib-tag" aria-label="Tag"></select>
+        <span class="spacer"></span>
+        <input id="lib-ft" type="search" placeholder="Search inside all contracts" aria-label="Search inside all contracts" />
+        <button id="lib-ft-go" class="btn btn-primary">Search text</button>
+      </div>
+      <div id="ft-results" class="ft-results" hidden></div>
+      <div class="table-wrap"><table id="lib-table"></table></div>
+    </section>
+
+    <section id="dtab-ask" class="dpane" hidden>
+      <p class="muted">Ask across every contract in your library, for example “Which contracts renew this quarter?” or “What do we owe Acme?”</p>
+      <div id="ask-messages" class="ask-messages"></div>
+      <form id="ask-form" class="composer inline">
+        <textarea id="ask-input" rows="1" placeholder="Ask all contracts" aria-label="Ask all contracts"></textarea>
+        <button class="btn btn-primary" type="submit">Send</button>
+      </form>
+    </section>
+
+    <section id="dtab-compare" class="dpane" hidden>
+      <div class="filters">
+        <select id="cmp-a" aria-label="First contract"></select>
+        <span class="muted">compared with</span>
+        <select id="cmp-b" aria-label="Second contract"></select>
+        <button id="cmp-go" class="btn btn-primary">Compare</button>
+        <span id="cmp-status" class="muted"></span>
+      </div>
+      <div class="table-wrap"><table id="cmp-table"></table></div>
+    </section>
+
+    <section id="dtab-security" class="dpane" hidden>
+      <h3>Protection status</h3>
+      <div id="sec-status" class="stats"></div>
+
+      <h3>Noise envelope for sending over a network</h3>
+      <p class="muted">Turn an image or any file into keyed static before it travels. It looks like a TV with no signal, and only someone with the passphrase can turn it back, exactly. A wrong passphrase, or any change to the image on the way, is rejected. Use it together with HTTPS, not instead of it.</p>
+      <div class="lab">
+        <div class="lab-card">
+          <h4>Scramble</h4>
+          <label for="nz-file">Image or file</label><input id="nz-file" type="file" />
+          <label for="nz-pass">Passphrase (8 or more characters)</label><input id="nz-pass" type="password" autocomplete="new-password" />
+          <button id="nz-go" class="btn btn-primary">Turn into static</button>
+          <div id="nz-out"></div>
+        </div>
+        <div class="lab-card">
+          <h4>Unscramble</h4>
+          <label for="nz-in-file">Static image (PNG)</label><input id="nz-in-file" type="file" accept="image/png" />
+          <label for="nz-in-pass">Passphrase</label><input id="nz-in-pass" type="password" autocomplete="off" />
+          <button id="nz-undo" class="btn btn-primary">Recover original</button>
+          <div id="nz-in-out"></div>
+        </div>
+      </div>
+
+      <h3>Audit log</h3>
+      <div class="table-wrap"><table id="audit-table"></table></div>
+    </section>
+
+    <section id="dtab-team" class="dpane" hidden>
+      <h3>Owners</h3>
+      <p class="muted">Map a party name from your contracts (such as “Acme Ltd” or “Vendor”) to a real person. Tasks are routed to them automatically.</p>
+      <form id="owner-form" class="filters">
+        <input id="ow-name" placeholder="Person name" required aria-label="Person name" />
+        <input id="ow-email" type="email" placeholder="Email" aria-label="Email" />
+        <input id="ow-party" placeholder="Party name in contract" required aria-label="Party name in contract" />
+        <button class="btn btn-primary" type="submit">Add owner</button>
+      </form>
+      <div class="table-wrap"><table id="owner-table"></table></div>
+      <h3>Reminder log</h3>
+      <p class="muted">Reminders are created at 30, 7 and 1 days before a deadline, and when a task is overdue. Email and Slack need settings in the backend <code>.env</code> file.</p>
+      <div id="notif-list" class="notif-list"></div>
+    </section>
+  </main>
 </div>
 
 <script src="js/api.js"></script>
 <script src="js/app.js"></script>
+<script src="js/dashboard.js"></script>
+<script src="js/landing.js"></script>
+<script src="js/sections.js"></script>
+<script src="js/handwriting.js"></script>
+<script src="js/security.js"></script>
 </body>
 </html>

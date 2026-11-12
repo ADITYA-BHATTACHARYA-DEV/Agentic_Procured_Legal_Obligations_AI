@@ -17,6 +17,9 @@ Return ONLY valid JSON in this exact shape:
   "parties": ["Full legal name of each party"],
   "effective_date": "YYYY-MM-DD or null",
   "term": "short description of duration/renewal or null",
+  "term_months": "integer number of months of the INITIAL term (e.g. 2 years -> 24) or null",
+  "auto_renews": "true if the contract renews automatically unless someone gives notice, false if it does not, null if unstated",
+  "notice_period_days": "integer days of notice required to terminate or stop renewal, or null",
   "governing_law": "jurisdiction or null",
   "summary": "3-4 plain-English sentences describing the purpose and key commercial terms"
 }}"""
@@ -39,13 +42,18 @@ Rules:
 - "category": one of payment | delivery | notice | confidentiality | compliance |
   renewal_termination | reporting | other
 - "priority": high (money, termination, liability, hard deadlines), medium, or low.
+- "recurrence": none | weekly | monthly | quarterly | semi-annual | annual. Use it when the
+  duty repeats ("pay monthly", "report quarterly"). Otherwise "none".
+- "amount": the money amount exactly as written (e.g. "USD 5,000") or null.
+- Keep relative deadlines VERBATIM including their anchor, e.g. "30 days after the Effective Date";
+  the system computes the real date from the anchor, so never calculate dates yourself.
 - "source_quote" is a SHORT verbatim snippet (max 25 words) proving the obligation.
 - Do NOT output rights, definitions, recitals or boilerplate. If none exist return an empty list.
 
 Return ONLY valid JSON:
 {{"obligations": [
   {{"description": "...", "owner": "...", "deadline": "...", "clause_ref": "...",
-    "category": "...", "priority": "...", "source_quote": "..."}}
+    "category": "...", "priority": "...", "recurrence": "...", "amount": "...", "source_quote": "..."}}
 ]}}"""
 
 

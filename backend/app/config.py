@@ -20,6 +20,16 @@ class Settings(BaseSettings):
     extract_max_tokens: int = 1024
     data_dir: Path = BASE_DIR / "data"
 
+    # reminders
+    reminder_hour: int = 9
+    default_notify_email: str = ""
+    smtp_host: str = ""
+    smtp_port: int = 587
+    smtp_user: str = ""
+    smtp_password: str = ""
+    smtp_from: str = "obligo@localhost"
+    slack_webhook_url: str = ""
+
     @property
     def upload_dir(self) -> Path:
         return self.data_dir / "uploads"

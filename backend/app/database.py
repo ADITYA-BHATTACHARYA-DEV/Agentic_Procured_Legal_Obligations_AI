@@ -1,9 +1,11 @@
-"""SQLite layer: documents, chats, messages, obligations, workflow tasks."""
+"""SQLite layer: documents, chats, messages, obligations, tasks, owners, tags, notifications, full-text pages."""
 import json
 import sqlite3
 from contextlib import contextmanager
 
 from .config import settings
+
+HAS_FTS = False
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS documents (
@@ -34,7 +36,28 @@ CREATE TABLE IF NOT EXISTS tasks (
     document_id TEXT, title TEXT, assignee TEXT, due_date TEXT,
     status TEXT DEFAULT 'todo', created_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
+CREATE TABLE IF NOT EXISTS owners (
+    id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, email TEXT, party TEXT
+);
+CREATE TABLE IF NOT EXISTS tags (
+    document_id TEXT REFERENCES documents(id) ON DELETE CASCADE, tag TEXT,
+    PRIMARY KEY (document_id, tag)
+);
+CREATE TABLE IF NOT EXISTS notifications (
+    id INTEGER PRIMARY KEY AUTOINCREMENT, task_id INTEGER, days_before INTEGER,
+    channel TEXT, recipient TEXT, message TEXT, status TEXT,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP, UNIQUE (task_id, days_before)
+);
 """
+
+# Columns added after the first release. Applied to old AND new databases.
+MIGRATIONS = {
+    "documents": [("effective_date", "TEXT"), ("term_months", "INTEGER"), ("auto_renews", "INTEGER"),
+                  ("notice_days", "INTEGER"), ("renewal_date", "TEXT"), ("governing_law", "TEXT")],
+    "obligations": [("kind", "TEXT DEFAULT 'obligation'"), ("due_date", "TEXT"),
+                    ("recurrence", "TEXT"), ("amount", "TEXT")],
+    "tasks": [("assignee_email", "TEXT")],
+}
 
 
 @contextmanager
@@ -50,11 +73,21 @@ def db():
 
 
 def init_db() -> None:
+    global HAS_FTS
     with db() as c:
         c.executescript(SCHEMA)
-        cols = [r[1] for r in c.execute("PRAGMA table_info(documents)")]
-        if "status" not in cols:  # migrate databases created by the first version
-            c.execute("ALTER TABLE documents ADD COLUMN status TEXT DEFAULT 'ready'")
+        for table, cols in MIGRATIONS.items():
+            existing = {r[1] for r in c.execute(f"PRAGMA table_info({table})")}
+            for name, ddl in cols:
+                if name not in existing:
+                    c.execute(f"ALTER TABLE {table} ADD COLUMN {name} {ddl}")
+        if not c.execute("SELECT 1 FROM sqlite_master WHERE name='pages_fts'").fetchone():
+            try:
+                c.execute("CREATE VIRTUAL TABLE pages_fts USING fts5(text, document_id UNINDEXED, page UNINDEXED)")
+            except sqlite3.OperationalError:  # SQLite built without FTS5: fall back to LIKE search
+                c.execute("CREATE TABLE pages_fts (text TEXT, document_id TEXT, page INTEGER)")
+        sql = c.execute("SELECT sql FROM sqlite_master WHERE name='pages_fts'").fetchone()[0] or ""
+        HAS_FTS = "VIRTUAL" in sql.upper()
 
 
 def rows(query: str, params: tuple = ()) -> list[dict]:

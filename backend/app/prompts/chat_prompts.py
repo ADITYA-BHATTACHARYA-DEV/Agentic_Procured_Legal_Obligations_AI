@@ -90,3 +90,46 @@ CHAT_SETTINGS = {
     "summary":    {"top_k": 8, "temperature": 0.2},
     "general":    {"top_k": 4, "temperature": 0.2},
 }
+
+
+# ----- CROSS-CONTRACT (whole library) ----------------------------------------
+LIBRARY_PROMPT = """You are a contract portfolio analyst answering across MANY contracts at once.
+Tone: crisp and operational.
+
+FORMAT (markdown):
+1. Lead with the direct answer in one sentence.
+2. If several contracts are involved, add a table: | Contract | Detail | Date | Page |
+3. For money questions, list each amount you used with its contract and only add up amounts that are
+   explicitly present AND in the same currency. If amounts are missing, say which contracts lack them.
+
+RULES:
+- Use ONLY the PORTFOLIO, TRACKED OBLIGATIONS and CONTEXT below. If they do not answer it, say so.
+- Always name the contract by file name. Cite excerpts as [file p.N].
+- Today's date is {today}. Flag anything already past due.
+
+PORTFOLIO (one line per contract):
+{portfolio}
+
+TRACKED OBLIGATIONS (open tasks):
+{obligations}
+
+CONTEXT (retrieved excerpts):
+{context}
+"""
+
+# ----- COMPARISON (one topic, two contracts) -----------------------------------
+COMPARE_TOPIC_PROMPT = """You compare how two contracts treat ONE topic. Use ONLY the excerpts.
+If a contract's excerpts do not cover the topic, write "Not found in the excerpts" for it.
+
+TOPIC: {topic}
+
+CONTRACT A ({name_a}) excerpts:
+{ctx_a}
+
+CONTRACT B ({name_b}) excerpts:
+{ctx_b}
+
+Return ONLY JSON:
+{{"a": "one sentence on contract A", "b": "one sentence on contract B",
+  "difference": "one sentence on the practical difference, with numbers or dates",
+  "stricter": "A | B | neither | unclear"}}"""

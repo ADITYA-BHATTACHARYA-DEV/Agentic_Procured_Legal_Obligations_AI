@@ -1,4 +1,4 @@
-"""ChromaDB persistence: one collection, filtered per document_id."""
+"""ChromaDB persistence: one collection, filtered per document (or a set of documents)."""
 import chromadb
 
 from ..config import settings
@@ -22,11 +22,17 @@ async def index_chunks(document_id: str, chunks: list[dict]) -> None:
         )
 
 
-async def search(document_id: str, query: str, k: int) -> list[dict]:
+async def search(document_id: str | None, query: str, k: int, document_ids: list[str] | None = None) -> list[dict]:
+    """document_id -> one contract; document_ids -> a set of contracts; neither -> whole library."""
     [vec] = await llm.embed([query])
-    res = _col.query(query_embeddings=[vec], n_results=k, where={"document_id": document_id})
+    kwargs: dict = {"query_embeddings": [vec], "n_results": k}
+    if document_id:
+        kwargs["where"] = {"document_id": document_id}
+    elif document_ids:
+        kwargs["where"] = {"document_id": {"$in": document_ids}}
+    res = _col.query(**kwargs)
     return [
-        {"text": d, "page": m["page"], "score": round(1 - dist, 3)}
+        {"text": d, "page": m["page"], "document_id": m["document_id"], "score": round(1 - dist, 3)}
         for d, m, dist in zip(res["documents"][0], res["metadatas"][0], res["distances"][0])
     ]
 
